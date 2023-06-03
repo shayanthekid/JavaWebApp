@@ -1,1 +1,6 @@
 Controller\NewServlet.class
+Models\Inventory$1.class
+Models\Inventory$InventoryBuilder.class
+Models\Inventory.class
+Controller\DBconnection.class
+Controller\InventoryController.class
