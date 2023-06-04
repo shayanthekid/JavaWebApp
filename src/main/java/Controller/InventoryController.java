@@ -4,12 +4,17 @@
  */
 package Controller;
 
+import Models.Employee;
 import Models.Inventory;
+import Models.Observer;
+import Models.Subject;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -20,7 +25,64 @@ import java.util.concurrent.TimeUnit;
  *
  * @author sajid
  */
-public class InventoryController {
+public class InventoryController implements Subject {
+     private List<Observer> observers;
+
+    public InventoryController() {
+
+        this.observers = new ArrayList<Observer>();
+
+    }
+    
+     public void addItem(Inventory inventory, Employee employee, Date date) {
+    // Validate input
+    if (!(inventory.getName() instanceof String) || inventory.getName().isEmpty()) {
+        throw new IllegalArgumentException("Name must be a non-empty string");
+    }
+    if (inventory.getPrice() <= 0) {
+        throw new IllegalArgumentException("Price must be greater than zero");
+    }
+    if (inventory.getQuantity() <= 0) {
+        throw new IllegalArgumentException("Quantity must be greater than zero");
+    }
+    if (!checkEmployee(employee.getId())) {
+        throw new IllegalArgumentException("Employee with ID " + employee.getId() + " does not exist.");
+    }
+
+    // Add items to inventory
+    try {
+        // Synchronize on the connection or a shared lock object
+        synchronized (DBconnection.class) { // only one thread can execute the synchronized block at a time.
+            DBconnection dbConnection = DBconnection.getInstance();
+            Connection connection = dbConnection.getConnection();
+            String insertSQL = "INSERT INTO inventory (name, price, quantity) VALUES ( ?, ?, ?) RETURNING id";
+            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
+            preparedStatement.setString(1, inventory.getName());
+            preparedStatement.setDouble(2, inventory.getPrice());
+            preparedStatement.setInt(3, inventory.getQuantity());
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.next()) {
+                int itemId = rs.getInt("id");
+                inventory.setId(itemId);
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    
+    synchronized (observers) {
+           /* 
+    synchronizing on the observers object, 
+     ensure that only one thread can modify the list at a time. 
+    Other threads attempting to modify the list will be blocked until the lock is released.
+    */
+        Observer observer = new Logger_controller();
+        addObserver(observer);
+    }
+    
+ 
+    notifyObservers("add", employee, inventory, date);
+}
     
     
 public List<Inventory> displayAllItems() {
@@ -99,5 +161,53 @@ public List<Inventory> displayAllItems() {
  * 
  */
     
+    public boolean checkEmployee(int id) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("Invalid Employee id");
+        }
+        try {
+            DBconnection dbConnection = DBconnection.getInstance();
+            Connection connection = dbConnection.getConnection();
+
+            String checkSQL = "SELECT COUNT(*) FROM log WHERE employeeid = ?";
+            PreparedStatement checkStatement = connection.prepareStatement(checkSQL);
+            checkStatement.setInt(1, id);
+            ResultSet checkResult = checkStatement.executeQuery();
+
+            if (checkResult.next()) {
+                int count = checkResult.getInt(1);
+                if (count == 0) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     
+public void addObserver(Observer observer) {
+
+        if (observers == null) {
+            observers = new ArrayList<Observer>();
+        }
+        observers.add(observer);
+
+    }
+
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(String action, Employee employee, Inventory inventory, Date date) {
+
+        for (Observer observer : observers) {
+            observer.update(action, employee, inventory, date);
+        }
+    }
+
 }
