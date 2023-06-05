@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit this template
+-->
+<html>
+<head>
+    <title>Delete Item</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>Delete Item</h1>
+    <form id="deleteForm">
+        <label for="itemId">Item ID:</label>
+        <input type="number" id="itemId" name="itemId" required><br>
+        
+        <label for="employeeId">Employee ID:</label>
+        <input type="number" id="employeeId" name="employeeId" required><br>
+        
+        <button type="button" onclick="deleteItem()">Delete Item</button>
+    </form>
+
+    <script>
+        function deleteItem() {
+            var itemId = document.getElementById("itemId").value;
+            var employeeId = document.getElementById("employeeId").value;
+
+            // Make a DELETE request using Axios
+            axios.delete("http://localhost:8080/mavenproject1/DeleteItemServlet", {
+                params: {
+                    itemId: itemId,
+                    employeeId: employeeId
+                }
+            })
+           .then(response => {
+            // Show success message
+            alert("Item deleted successfully");
+        })
+        .catch(error => {
+            // Show error message
+            alert("An error occurred while deleting the item");
+            console.error(error);
+        });
+        }
+    </script>
+</body>
+</html>

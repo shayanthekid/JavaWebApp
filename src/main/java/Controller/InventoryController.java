@@ -34,7 +34,7 @@ public class InventoryController implements Subject {
 
     }
     
-     public void addItem(Inventory inventory, Employee employee, Date date) {
+     public synchronized void addItem(Inventory inventory, Employee employee, Date date) {
     // Validate input
     if (!(inventory.getName() instanceof String) || inventory.getName().isEmpty()) {
         throw new IllegalArgumentException("Name must be a non-empty string");
@@ -83,7 +83,7 @@ public class InventoryController implements Subject {
  
     notifyObservers("add", employee, inventory, date);
 }
-   public List<Inventory> displayAllItemsWithCost() {
+   public  List<Inventory> displayAllItemsWithCost() {
    final List<Inventory> items = new ArrayList<>();
     double totalCost = 0;
 
@@ -152,7 +152,7 @@ public class InventoryController implements Subject {
     return items;
 }
 
-public List<Inventory> displayAllItems() {
+public  List<Inventory> displayAllItems() {
     final List<Inventory> items = new ArrayList<>();
 
     try {
@@ -213,6 +213,75 @@ public List<Inventory> displayAllItems() {
     return items;
 }
 
+ public synchronized void removeItem(Inventory inventory, Employee employee, Date date) {
+        if (employee == null || employee.getId() <= 0) {
+            throw new IllegalArgumentException("Invalid employee details");
+        }
+        if (inventory == null || inventory.getID() <= 0) {
+            throw new IllegalArgumentException("Invalid inventory details");
+        }
+        if (date == null) {
+            throw new IllegalArgumentException("Invalid date");
+        }
+
+        if (!checkItem(inventory.getID())) {
+            throw new IllegalArgumentException("Item not found");
+        }
+
+        try {
+            DBconnection dbConnection = DBconnection.getInstance();
+            Connection connection = dbConnection.getConnection();
+
+            if (checkItem(inventory.getID())) {
+                // Perform database operations within the synchronized block
+                synchronized (this) {
+                    String removeSQL = "update log set inventoryid = null where inventoryid = ?";
+                    PreparedStatement removeStatement = connection.prepareStatement(removeSQL);
+                    removeStatement.setInt(1, inventory.getID());
+                    removeStatement.executeUpdate();
+
+                    String removeSQL2 = "DELETE FROM inventory WHERE id = ?";
+                    PreparedStatement removeStatement2 = connection.prepareStatement(removeSQL2);
+                    removeStatement2.setInt(1, inventory.getID());
+                    removeStatement2.executeUpdate();
+                    System.out.println("Item Deleted");
+
+                    notifyObservers("remove", employee, inventory, date);
+                }
+            } else {
+                throw new IllegalArgumentException("Item with ID " + inventory.getID() + " does not exist.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+  
+ public boolean checkItem(int id) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("Invalid item id");
+        }
+        try {
+            DBconnection dbConnection = DBconnection.getInstance();
+            Connection connection = dbConnection.getConnection();
+
+            String checkSQL = "SELECT COUNT(*) FROM inventory WHERE id = ?";
+            PreparedStatement checkStatement = connection.prepareStatement(checkSQL);
+            checkStatement.setInt(1, id);
+            ResultSet checkResult = checkStatement.executeQuery();
+
+            if (checkResult.next()) {
+                int count = checkResult.getInt(1);
+                if (count == 0) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 /** 
  * 
  * 

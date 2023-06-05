@@ -12,6 +12,10 @@
         <servlet-name>GetItemCostServlet</servlet-name>
         <servlet-class>Controller.GetItemCostServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>DeleteItemServlet</servlet-name>
+        <servlet-class>Controller.DeleteItemServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>NewServlet</servlet-name>
         <url-pattern>/NewServlet</url-pattern>
@@ -23,6 +27,10 @@
     <servlet-mapping>
         <servlet-name>GetItemCostServlet</servlet-name>
         <url-pattern>/GetItemCostServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteItemServlet</servlet-name>
+        <url-pattern>/DeleteItemServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
