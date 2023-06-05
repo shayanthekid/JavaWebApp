@@ -14,12 +14,14 @@ public class Inventory {
     private String name;
     private float price;
     private int quantity;
+    private double cost;
 
     private Inventory(InventoryBuilder builder) {
         this.id = builder.id;
         this.name = builder.name;
         this.price = builder.price;
         this.quantity = builder.quantity;
+        this.cost = builder.cost;
     }
 
     public static class InventoryBuilder {
@@ -28,6 +30,7 @@ public class Inventory {
         private String name;
         private float price;
         private int quantity;
+        private double cost;
 
         public InventoryBuilder name(String name) {
             this.name = name;
@@ -49,11 +52,15 @@ public class Inventory {
             return this;
         }
 
+        public InventoryBuilder cost(double cost) {
+            this.cost = cost;
+            return this;
+        }
+
         public Inventory build() {
             return new Inventory(this);
         }
     }
-    // getters and setters
 
     public void setId(int id) {
         this.id = id;
@@ -71,6 +78,10 @@ public class Inventory {
         this.quantity = quantity;
     }
 
+    public void setCost(double cost) {
+        this.cost = cost;
+    }
+
     public int getID() {
         return id;
     }
@@ -85,5 +96,9 @@ public class Inventory {
 
     public int getQuantity() {
         return quantity;
+    }
+
+    public double getCost() {
+        return cost;
     }
 }

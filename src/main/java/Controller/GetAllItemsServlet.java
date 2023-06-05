@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class NewServlet extends HttpServlet {
+public class GetAllItemsServlet extends HttpServlet {
 
 //    private String url = "jdbc:postgresql://localhost:5432/Inventory";
 //    private String username = "postgres";

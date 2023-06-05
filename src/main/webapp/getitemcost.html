@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit this template
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+    <body>
+        <h1>Item Cost</h1>
+      
+        <div id="itemsContainer"></div>
+
+        <script>
+            // Function to retrieve items using AJAX
+            function retrieveItems() {
+                $.ajax({
+                    url: 'http://localhost:8080/mavenproject1/GetItemCostServlet', // Replace with your servlet URL
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (response) {
+                        // Process the JSON response
+                        displayItems(response);
+                    },
+                    error: function () {
+                        console.error('Failed to retrieve items');
+                    }
+                });
+            }
+
+            // Function to display the items on the page
+            function displayItems(items) {
+                var itemsContainer = $('#itemsContainer');
+
+                // Clear the container
+                itemsContainer.empty();
+
+                // Create a table element
+                var table = $('<table>');
+
+                // Create table headers
+                var headers = $('<tr>');
+                headers.append($('<th>').text('ID'));
+                headers.append($('<th>').text('Name'));
+                headers.append($('<th>').text('Price'));
+                headers.append($('<th>').text('Quantity'));
+                headers.append($('<th>').text('Cost'));
+                table.append(headers);
+
+                // Iterate over the items and create table rows
+                items.forEach(function (item) {
+                    var row = $('<tr>');
+                    row.append($('<td>').text(item.id));
+                    row.append($('<td>').text(item.name));
+                    row.append($('<td>').text(item.price));
+                    row.append($('<td>').text(item.quantity));
+                    row.append($('<td>').text(item.cost));
+                    table.append(row);
+                });
+
+                // Append the table to the items container
+                itemsContainer.append(table);
+            }
+
+            // Call the retrieveItems function when the page is ready
+            $(document).ready(function () {
+                retrieveItems();
+            });
+        </script>
+    </body>
+</html>

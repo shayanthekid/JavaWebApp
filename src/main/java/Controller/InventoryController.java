@@ -83,8 +83,75 @@ public class InventoryController implements Subject {
  
     notifyObservers("add", employee, inventory, date);
 }
-    
-    
+   public List<Inventory> displayAllItemsWithCost() {
+   final List<Inventory> items = new ArrayList<>();
+    double totalCost = 0;
+
+    try {
+        DBconnection dbConnection = DBconnection.getInstance();
+        Connection connection = dbConnection.getConnection();
+
+        String displaySQL = "SELECT * FROM inventory";
+        Statement stmt = connection.createStatement();
+        ResultSet result = stmt.executeQuery(displaySQL);
+
+        // Create a thread pool
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+
+        while (result.next()) {
+            final int id = result.getInt("id");
+            final String name = result.getString("name");
+            final float price = result.getFloat("price");
+            final int quantity = result.getInt("quantity");
+
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    Inventory item = new Inventory.InventoryBuilder()
+                            .id(id)
+                            .name(name)
+                            .price(price)
+                            .quantity(quantity)
+                            .build();
+                    double cost = item.getPrice() * item.getQuantity();
+                    item.setCost(cost); // Set the cost value
+                    synchronized (items) {
+                        items.add(item);
+                    }
+                }
+            };
+
+            executor.execute(task);
+        }
+
+        // Shutdown the executor and wait for all tasks to complete
+        executor.shutdown();
+        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+
+        System.out.printf("%5s %20s %10s %10s %10s", "ID", "NAME", "PRICE", "QUANTITY", "COST");
+        System.out.println();
+        System.out.println("---------------------------------------------------------------");
+
+        for (Inventory item : items) {
+            double cost = item.getPrice() * item.getQuantity();
+            totalCost += cost;
+            System.out.printf("%5d %20s %10.2f %10d %10.2f", item.getID(), item.getName(), item.getPrice(), item.getQuantity(), cost);
+            System.out.println();
+        }
+
+        // Display the total cost of all items
+        System.out.println("---------------------------------------------------------------");
+        System.out.printf("%5s %20s %10s %10s %10.2f", "", "", "", "TOTAL COST:", totalCost);
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+    }
+
+    return items;
+}
+
 public List<Inventory> displayAllItems() {
     final List<Inventory> items = new ArrayList<>();
 
