@@ -16,6 +16,10 @@
         <servlet-name>DeleteItemServlet</servlet-name>
         <servlet-class>Controller.DeleteItemServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>UpdateItemServlet</servlet-name>
+        <servlet-class>Controller.UpdateItemServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>NewServlet</servlet-name>
         <url-pattern>/NewServlet</url-pattern>
@@ -31,6 +35,10 @@
     <servlet-mapping>
         <servlet-name>DeleteItemServlet</servlet-name>
         <url-pattern>/DeleteItemServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UpdateItemServlet</servlet-name>
+        <url-pattern>/UpdateItemServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

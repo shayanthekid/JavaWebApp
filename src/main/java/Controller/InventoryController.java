@@ -255,7 +255,48 @@ public  List<Inventory> displayAllItems() {
             e.printStackTrace();
         }
     }
-  
+ 
+public void updateItem(Inventory inventory, Employee employee, Date date) {
+    if (!checkItem(inventory.getID())) {
+        System.out.println("Item with ID " + inventory.getID() + " does not exist.");
+        return;
+    }
+    if (!checkEmployee(employee.getId())) {
+        throw new IllegalArgumentException("Employee with ID " + employee.getId() + " does not exist.");
+    }
+
+    // Create a lock object
+    Object lock = new Object();
+
+    // Synchronize on the lock object to ensure thread safety
+    synchronized (lock) {
+        try {
+            DBconnection dbConnection = DBconnection.getInstance();
+            Connection connection = dbConnection.getConnection();
+
+            String updateSQL = "UPDATE inventory SET price = ?, quantity = ? WHERE id = ?";
+            PreparedStatement updateStatement = connection.prepareStatement(updateSQL);
+            updateStatement.setDouble(1, inventory.getPrice());
+            updateStatement.setInt(2, inventory.getQuantity());
+            updateStatement.setInt(3, inventory.getID());
+            int rowsUpdated = updateStatement.executeUpdate();
+
+            if (rowsUpdated > 0) {
+                System.out.println("Item updated");
+
+                Observer observer = new Logger_controller();
+                this.addObserver(observer);
+                notifyObservers("Updated", employee, inventory, date);
+            } else {
+                System.out.println("Item update failed");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
  public boolean checkItem(int id) {
         if (id <= 0) {
             throw new IllegalArgumentException("Invalid item id");
