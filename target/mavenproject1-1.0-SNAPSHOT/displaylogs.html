@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit this template
+-->
+<html>
+<head>
+    <title>Log Viewer</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            retrieveLogs();
+        });
+
+        function retrieveLogs() {
+            $.ajax({
+                url: 'http://localhost:8080/mavenproject1/DisplayLogsServlet',
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    displayLogs(response);
+                },
+                error: function() {
+                    console.error('Failed to retrieve logs');
+                }
+            });
+        }
+
+        function displayLogs(logs) {
+            var logsContainer = $('#logsContainer');
+            logsContainer.empty();
+
+            var table = $('<table>');
+            var headers = $('<tr>');
+            headers.append($('<th>').text('ID'));
+            headers.append($('<th>').text('Employee ID'));
+            headers.append($('<th>').text('Inventory ID'));
+            headers.append($('<th>').text('Type'));
+            headers.append($('<th>').text('Date Logged'));
+            table.append(headers);
+
+            logs.forEach(function(log) {
+                var row = $('<tr>');
+                row.append($('<td>').text(log.ID));
+                row.append($('<td>').text(log.EmployeeID.id));
+                row.append($('<td>').text(log.InventoryID.id));
+                row.append($('<td>').text(log.type));
+                row.append($('<td>').text(log.date_logged));
+                table.append(row);
+            });
+
+            logsContainer.append(table);
+        }
+    </script>
+</head>
+<body>
+    <div id="logsContainer"></div>
+</body>
+</html>
+

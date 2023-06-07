@@ -6,44 +6,55 @@ package Controller;
 
 import Models.Employee;
 import Models.Inventory;
+import Models.Log;
 import Models.Observer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
  * @author sajid
  */
 public class Logger_controller  implements Observer {
-    public void displayLogs() {
-        try {
-            DBconnection dbConnection = DBconnection.getInstance();
-            Connection connection = dbConnection.getConnection();
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM log");
-            System.out.println("+------------------------------------------------+");
-            System.out.println("| ID  | Employee ID | Inventory ID | Type  | Date Logged  |");
-            System.out.println("+------------------------------------------------+");
+ public List<Log> displayLogs() {
+    List<Log> logs = new ArrayList<>();
+    try {
+        DBconnection dbConnection = DBconnection.getInstance();
+        Connection connection = dbConnection.getConnection();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM log");
+        
+        // Iterate through the result set and add logs to the list
+        while (resultSet.next()) {
+            Log log = new Log();
+            log.setID(resultSet.getInt("ID"));
+             
+            
+            Employee employee = new Employee.EmployeeBuilder(resultSet.getInt("employeeid")).build();
+            log.setEmployeeID(employee);
 
-            //iterate through result set and print data
-            while (resultSet.next()) {
-                System.out.printf("| %-4d | %-11d | %-12d | %-5s | %-14s |%n",
-                        resultSet.getInt("ID"),
-                        resultSet.getInt("employeeid"),
-                        resultSet.getInt("inventoryid"),
-                        resultSet.getString("type"),
-                        resultSet.getDate("datelogged"));
-                System.out.println("+------------------------------------------------+");
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+            Inventory inventory = new Inventory.InventoryBuilder()
+                            .id(resultSet.getInt("inventoryid"))
+                            .build();
+            log.setInventoryID(inventory);
+            
+            log.setType(resultSet.getString("type"));
+            log.setDateLogged(resultSet.getDate("datelogged"));
+            
+            logs.add(log);
         }
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    
+    return logs;
+}
 
     public void update(String action, Employee employee, Inventory inventory, Date date) {
         //log the action, employee, and inventory to the database    

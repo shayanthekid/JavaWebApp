@@ -18,6 +18,10 @@ public class Log {
     private String type;
     private Date date_logged;
 
+     public Log() {
+ 
+    }
+
     public Log(int ID, Employee EmployeeID, Inventory InventoryID, String type, Date date_logged) {
         this.ID = ID;
         this.EmployeeID = EmployeeID;

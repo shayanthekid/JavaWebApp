@@ -9,27 +9,31 @@
     <h1>My name is Rakesh and I am from Uttar Pradesh</h1>
     <a href="./additem.html">add item</a>
     <a href="./getitemcost.html">Get Item Cost</a>
-    <a href="./updateitem.html">Update Item</a>
+        <a href="./up">Update Item</a>
     <a href="./deleteitem.html">Delete Item</a>
+    <a href="./displaylogs.html">Display Logs</a>
 
     <div id="itemsContainer"></div>
 
     <script>
         // Function to retrieve items using AJAX
-        function retrieveItems() {
-            $.ajax({
-                url: 'http://localhost:8080/mavenproject1/NewServlet', // Replace with your servlet URL
-                method: 'GET',
-                dataType: 'json',
-                success: function (response) {
-                    // Process the JSON response
-                    displayItems(response);
-                },
-                error: function () {
-                    console.error('Failed to retrieve items');
-                }
-            });
-        }
+     function retrieveItems() {
+        $.ajax({
+            url: 'http://localhost:8080/mavenproject1/NewServlet', // Replace with your servlet URL
+            method: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                // Process the JSON response
+                displayItems(response);
+
+                // Schedule the next poll
+                setTimeout(retrieveItems, 10000); // Poll every 10 seconds
+            },
+            error: function () {
+                console.error('Failed to retrieve items');
+            }
+        });
+    }
 
         // Function to display the items on the page
      function displayItems(items) {

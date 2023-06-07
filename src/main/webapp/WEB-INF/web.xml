@@ -20,6 +20,10 @@
         <servlet-name>UpdateItemServlet</servlet-name>
         <servlet-class>Controller.UpdateItemServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>DisplayLogsServlet</servlet-name>
+        <servlet-class>Controller.DisplayLogsServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>NewServlet</servlet-name>
         <url-pattern>/NewServlet</url-pattern>
@@ -39,6 +43,10 @@
     <servlet-mapping>
         <servlet-name>UpdateItemServlet</servlet-name>
         <url-pattern>/UpdateItemServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DisplayLogsServlet</servlet-name>
+        <url-pattern>/DisplayLogsServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
