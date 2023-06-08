@@ -328,7 +328,7 @@ public void updateItem(Inventory inventory, Employee employee, Date date) {
  * 
  * Threading allows multiple tasks or operations to be executed concurrently, which can help improve performance and responsiveness in certain scenarios.
  * In this code, threading is used to execute the database queries and object creation for each row in parallel, leveraging the available threads in the thread pool. 
- * This can potentially speed up the retrieval of data from the database.
+ * This can potentially spding is used to execute theed up the retrieval of data from the database.
  * 
  * By using threading, each user's request can be processed concurrently without blocking other users. 
  * This can improve the overall performance and responsiveness of the application, as multiple users can be served simultaneously.

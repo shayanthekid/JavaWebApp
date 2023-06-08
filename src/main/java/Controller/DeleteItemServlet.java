@@ -31,25 +31,32 @@ public class DeleteItemServlet extends HttpServlet {
      */
 
 
-      protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    try {
         // Retrieve the input parameters from the request
         int itemId = Integer.parseInt(request.getParameter("itemId"));
         int employeeId = Integer.parseInt(request.getParameter("employeeId"));
-         java.sql.Date date = new java.sql.Date(new Date().getTime());
-          InventoryController inventoryController = new InventoryController();
-         Inventory inventory = new Inventory.InventoryBuilder()
+        java.sql.Date date = new java.sql.Date(new Date().getTime());
+        
+        InventoryController inventoryController = new InventoryController();
+        Inventory inventory = new Inventory.InventoryBuilder()
             .id(itemId)
             .build();
 
-    Employee employee = new Employee.EmployeeBuilder(employeeId).build();
-        // Get other necessary parameters as needed
-
+        Employee employee = new Employee.EmployeeBuilder(employeeId).build();
+        
         // Call the removeItem method with the provided parameters
-        // Assuming you have an instance of your inventory management class named 'inventoryManager'
         inventoryController.removeItem(inventory, employee, date);
         
-        // Redirect the user to a success page or appropriate response
+        // Set success response code and message
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.getWriter().write("Item deleted successfully");
+    } catch (Exception e) {
+        // Set error response code and message
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        response.getWriter().write("Error deleting item: " + e.getMessage());
     }
+}
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
