@@ -32,6 +32,10 @@
         <servlet-name>GetPersonalUsageServlet</servlet-name>
         <servlet-class>Controller.GetPersonalUsageServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ResponseFilter</servlet-name>
+        <servlet-class>Controller.ResponseFilter</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>NewServlet</servlet-name>
         <url-pattern>/NewServlet</url-pattern>
@@ -63,6 +67,10 @@
     <servlet-mapping>
         <servlet-name>GetPersonalUsageServlet</servlet-name>
         <url-pattern>/GetPersonalUsageServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ResponseFilter</servlet-name>
+        <url-pattern>/ResponseFilter</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
