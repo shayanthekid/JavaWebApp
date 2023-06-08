@@ -7,6 +7,7 @@ package Controller;
 import Models.Employee;
 import Models.Inventory;
 import Models.Log;
+import Models.LogJson;
 import Models.Observer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -74,53 +75,53 @@ public class Logger_controller  implements Observer {
         }
     }
 
-    public void CheckUsage(Employee employee) {
-        try {
+public List<LogJson> CheckUsage(Employee employee) {
+    List<LogJson> logsJson = new ArrayList<>();
 
-            if (employee == null || employee.getId() <= 0) {
-                throw new IllegalArgumentException("Invalid employee details");
-            }
-            if (!checkEmployee(employee.getId())) {
+    try {
+        if (employee == null || employee.getId() <= 0) {
+            throw new IllegalArgumentException("Invalid employee details");
+        }
+        if (!checkEmployee(employee.getId())) {
+            throw new IllegalArgumentException("Employee with ID " + employee.getId() + " does not exist.");
+        }
+
+        try {
+            DBconnection dbConnection = DBconnection.getInstance();
+            Connection connection = dbConnection.getConnection();
+            Statement statement = connection.createStatement();
+
+            if (checkEmployee(employee.getId())) {
+                String query = "SELECT log.id, log.employeeid, log.inventoryid, log.type, log.datelogged, employee.name AS employee_name, inventory.name AS inventory_name FROM log "
+                        + "JOIN employee ON log.employeeid = employee.id "
+                        + "JOIN inventory ON log.inventoryid = inventory.id "
+                        + "WHERE log.employeeid = " + employee.getId();
+                ResultSet resultSet = statement.executeQuery(query);
+
+                while (resultSet.next()) {
+                    LogJson logJson = new LogJson();
+                    logJson.id = resultSet.getInt("id");
+                    logJson.employeeId = resultSet.getInt("employeeid");
+                    logJson.employeeName = resultSet.getString("employee_name");
+                    logJson.inventoryId = resultSet.getInt("inventoryid");
+                    logJson.inventoryName = resultSet.getString("inventory_name");
+                    logJson.type = resultSet.getString("type");
+                    logJson.dateLogged = resultSet.getDate("datelogged").toString();
+                    logsJson.add(logJson);
+                }
+            } else {
                 throw new IllegalArgumentException("Employee with ID " + employee.getId() + " does not exist.");
             }
-
-            try {
-                DBconnection dbConnection = DBconnection.getInstance();
-                Connection connection = dbConnection.getConnection();
-                Statement statement = connection.createStatement();
-
-                if (checkEmployee(employee.getId())) {
-                    String query = "SELECT log.id, log.employeeid, log.inventoryid, log.type, log.datelogged, employee.name AS employee_name, inventory.name AS inventory_name FROM log "
-                            + "JOIN employee ON log.employeeid = employee.id "
-                            + "JOIN inventory ON log.inventoryid = inventory.id "
-                            + "WHERE log.employeeid = " + employee.getId();
-                    ResultSet resultSet = statement.executeQuery(query);
-
-                    String format = "%1$-5s %2$-15s %3$-20s %4$-15s %5$-20s %6$-10s %7$-20s%n";
-                    System.out.printf(format, "ID", "Employee ID", "Employee Name", "Inventory ID", "Inventory Name", "Type", "Date Logged");
-
-                    while (resultSet.next()) {
-                        System.out.printf(format,
-                                resultSet.getInt("id"),
-                                resultSet.getInt("employeeid"),
-                                resultSet.getString("employee_name"),
-                                resultSet.getInt("inventoryid"),
-                                resultSet.getString("inventory_name"),
-                                resultSet.getString("type"),
-                                resultSet.getDate("datelogged")
-                        );
-                    }
-                } else {
-                    throw new IllegalArgumentException("Employee with ID " + employee.getId() + " does not exist.");
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
+    } catch (IllegalArgumentException e) {
+        System.out.println("Error: " + e.getMessage());
     }
+
+    return logsJson;
+}
 
     // check if employee exists
     public boolean checkEmployee(int id) {

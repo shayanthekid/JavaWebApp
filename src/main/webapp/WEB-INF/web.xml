@@ -28,6 +28,10 @@
         <servlet-name>CheckUsageServlet</servlet-name>
         <servlet-class>Controller.CheckUsageServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>GetPersonalUsageServlet</servlet-name>
+        <servlet-class>Controller.GetPersonalUsageServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>NewServlet</servlet-name>
         <url-pattern>/NewServlet</url-pattern>
@@ -55,6 +59,10 @@
     <servlet-mapping>
         <servlet-name>CheckUsageServlet</servlet-name>
         <url-pattern>/CheckUsageServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>GetPersonalUsageServlet</servlet-name>
+        <url-pattern>/GetPersonalUsageServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
