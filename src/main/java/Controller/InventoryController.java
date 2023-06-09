@@ -227,6 +227,10 @@ public  List<Inventory> displayAllItems() {
         if (!checkItem(inventory.getID())) {
             throw new IllegalArgumentException("Item not found");
         }
+        
+        if (!checkEmployee(employee.getId())) {
+            throw new IllegalArgumentException("Employee ID does not exist");
+        }
 
         try {
             DBconnection dbConnection = DBconnection.getInstance();

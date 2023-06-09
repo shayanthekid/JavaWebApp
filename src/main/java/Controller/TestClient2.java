@@ -85,7 +85,7 @@ public class TestClient2 {
         try {
     for (int i = 0; i < 10; i++) {
         for (TestClient2 client : clients) {
-            URL request = new URL("http://localhost:8080/mavenproject1/DeleteItemServlet?itemId=23&employeeId=1");
+            URL request = new URL("http://localhost:8080/mavenproject1/DeleteItemServlet?itemId=33&employeeId=1");
             client.sendRequest(request);
 
             // Introduce a delay of 100 milliseconds between requests

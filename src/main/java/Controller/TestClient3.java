@@ -1,15 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package Controller;
-
-/**
- *
- * @author sajid
- */
-
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -17,7 +7,7 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.io.OutputStream;
+
 public class TestClient3 {
 
     private final BlockingQueue<URL> requestQueue;
@@ -48,10 +38,32 @@ public class TestClient3 {
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+
+            String params = "itemId=25&price=22&quantity=1&employeeId=1";
+            byte[] postData = params.getBytes("UTF-8");
+            connection.setRequestProperty("Content-Length", Integer.toString(postData.length));
+
+            OutputStream outputStream = null;
+            try {
+                outputStream = connection.getOutputStream();
+                outputStream.write(postData);
+                outputStream.flush();
+            } catch (IOException e) {
+                System.out.println("Error sending request data: " + e.getMessage());
+            } finally {
+                if (outputStream != null) {
+                    try {
+                        outputStream.close();
+                    } catch (IOException e) {
+                        System.out.println("Error closing output stream: " + e.getMessage());
+                    }
+                }
+            }
 
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                System.out.println("Response: Item updated successfully.");
+                System.out.println("Item removed successfully");
             } else {
                 System.out.println("Request failed with response code: " + responseCode);
             }
@@ -63,17 +75,18 @@ public class TestClient3 {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        List<TestClient2> clients = new ArrayList<>();
+        String servletUrl = "http://localhost:8080/mavenproject1/UpdateItemServlet";
+        List<TestClient3> clients = new ArrayList<>();
 
-        // Create 2 clients
-        for (int i = 0; i < 2; i++) {
-            clients.add(new TestClient2());
+        // Create 30 clients
+        for (int i = 0; i < 30; i++) {
+            clients.add(new TestClient3());
         }
 
         List<Thread> threads = new ArrayList<>();
 
         // Start the processing thread for each client
-        for (final TestClient2 client : clients) {
+        for (final TestClient3 client : clients) {
             Thread clientThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -84,37 +97,14 @@ public class TestClient3 {
             clientThread.start();
         }
 
-        // Simulate sending update requests
+        // Simulate sending requests
         try {
-            for (int i = 0; i < 10; i++) {
-             for (TestClient2 client : clients) {
-    URL request = new URL("http://localhost:8080/mavenproject1/UpdateItemServlet");
-    HttpURLConnection connection = (HttpURLConnection) request.openConnection();
-    connection.setRequestMethod("POST");
-    connection.setDoOutput(true);
-
-    // Set the request parameters
-    String parameters = "itemId=25&price=999&quantity=10&employeeId=1";
-    byte[] postData = parameters.getBytes("UTF-8");
-
-    connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-    connection.setRequestProperty("Content-Length", String.valueOf(postData.length));
-
-    // Write the parameters to the output stream
-   try (OutputStream outputStream = connection.getOutputStream()) {
-    outputStream.write(postData);
-}
-    client.sendRequest(request);
-
-    // Introduce a delay of 100 milliseconds between requests
-    Thread.sleep(100);
-}
-
+            for (int i = 0; i < 30; i++) {
+                URL request = new URL(servletUrl);
+                clients.get(i % clients.size()).sendRequest(request);
             }
         } catch (IOException e) {
             System.out.println("Error creating URL: " + e.getMessage());
-        } catch (InterruptedException e) {
-            System.out.println("Error occurred during delay: " + e.getMessage());
         }
 
         // Wait for the processing to complete
